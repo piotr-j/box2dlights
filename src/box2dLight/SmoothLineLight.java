@@ -547,7 +547,9 @@ public class SmoothLineLight extends Light implements DebugLight {
 			for (int i = 0; i < currentRayNum; i++) {
 				currentId = i;
 				LineRay ray = lineRays[i];
-				rayHandler.world.rayCast(rayCB, ray.start, ray.end);
+				if (!ray.start.equals(ray.end)) {
+					rayHandler.world.rayCast(rayCB, ray.start, ray.end);
+				}
 			}
 
 			// we need to sort if stuff was added to set the mesh properly

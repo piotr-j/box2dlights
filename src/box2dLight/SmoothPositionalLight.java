@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.NumberUtils;
 
 import java.util.Comparator;
 
@@ -448,6 +449,19 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 			x = y = 0;
 			angle = sin = cos = 0;
 			fraction = 1;
+		}
+
+		@Override
+		public boolean equals (Object obj) {
+			// no class checking here
+
+			if (this == obj) return true;
+			if (obj == null) return false;
+
+			Vector2 other = (Vector2)obj;
+			if (NumberUtils.floatToIntBits(x) != NumberUtils.floatToIntBits(other.x)) return false;
+			if (NumberUtils.floatToIntBits(y) != NumberUtils.floatToIntBits(other.y)) return false;
+			return true;
 		}
 
 		@Override public String toString () {

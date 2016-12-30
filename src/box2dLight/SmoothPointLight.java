@@ -25,7 +25,10 @@ public class SmoothPointLight extends SmoothPositionalLight {
 			// shoot check each ray
 			for (int i = 0; i < currentRayNum; i++) {
 				// rayCast is not async, so we can do that
-				rayHandler.world.rayCast(perfectRay, start, current = rays[i]);
+				if (!rays[i].equals(start)) {
+					current = rays[i];
+					rayHandler.world.rayCast(perfectRay, start, current);
+				}
 			}
 
 			// we need to sort if stuff was added to set the mesh properly
