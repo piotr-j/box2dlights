@@ -276,6 +276,7 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 		if (start.epsilonEquals(candidate, 0.01f)) {
 			return false;
 		}
+		if (candidate.isZeroLen()) return false;
 		// if it is a duplicate, we dont want it
 		for (int i = 0; i < currentRayNum; i++) {
 			Ray ray = rays[i];
@@ -412,6 +413,7 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 	}
 
 	public static class Ray extends Vector2 {
+		public static float ZERO_LEN_EPSILON = 0.01f;
 		public Vector2 center;
 		public float fraction;
 		public float angle;
@@ -442,6 +444,10 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 			sin = MathUtils.sin(angle);
 			cos = MathUtils.cos(angle);
 			return this;
+		}
+
+		public boolean isZeroLen() {
+			return center.epsilonEquals(this, ZERO_LEN_EPSILON);
 		}
 
 		public void reset () {
