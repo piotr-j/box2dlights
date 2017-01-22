@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Sort;
 
 import java.util.Comparator;
 
@@ -77,10 +78,13 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 		@Override public int compare (Ray r1, Ray r2) {
 			if (r1.x == r2.x && r1.y == r2.y) return 0;
 			// rotate points so first one is at the top
-			float r1x = (r1.x - start.x) * sorterCos - (r1.y - start.y) * sorterSin;
-			float r1y = (r1.x - start.x) * sorterSin + (r1.y - start.y) * sorterCos;
-			float r2x = (r2.x - start.x) * sorterCos - (r2.y - start.y) * sorterSin;
-			float r2y = (r2.x - start.x) * sorterSin + (r2.y - start.y) * sorterCos;
+			Vector2 start = r1.center;
+			final float sorterSin = SmoothPositionalLight.this.sorterSin;
+			final float sorterCos = SmoothPositionalLight.this.sorterCos;
+			final float r1x = (r1.x - start.x) * sorterCos - (r1.y - start.y) * sorterSin;
+			final float r1y = (r1.x - start.x) * sorterSin + (r1.y - start.y) * sorterCos;
+			final float r2x = (r2.x - start.x) * sorterCos - (r2.y - start.y) * sorterSin;
+			final float r2y = (r2.x - start.x) * sorterSin + (r2.y - start.y) * sorterCos;
 
 			if (r1x == r2x && r2x == r2y) return 0;
 			if (r1x >= 0 && r2x < 0) return -1;
@@ -441,6 +445,7 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 			this.y = y;
 			this.fraction = fraction;
 			angle = MathUtils.atan2(y - center.y, x - center.x);
+			if (angle < -MathUtils.PI2) angle += MathUtils.PI;
 			sin = MathUtils.sin(angle);
 			cos = MathUtils.cos(angle);
 			return this;
@@ -457,7 +462,7 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 		}
 
 		@Override public String toString () {
-			return String.format("Ray([%.2f, %.2f] a=%.2f, f=%.2f)", x, y, angle * MathUtils.radDeg, fraction);
+			return String.format("Ray([%.2f, %.2f] a=%.2f, f=%.2f)", x - center.x,  y - center.y, angle * MathUtils.radDeg, fraction);
 		}
 	}
 
@@ -486,6 +491,7 @@ public abstract class SmoothPositionalLight extends Light implements DebugLight 
 		}
 		if (isSoft()) {
 			int numVertices = softShadowMesh.getNumVertices();
+			softShadowMesh.getVertices(segments);
 			for (int i = 0; i < numVertices * 4 - 8; i += 8) {
 				renderer.line(sx, sy, segments[i + 4], segments[i + 5]);
 			}

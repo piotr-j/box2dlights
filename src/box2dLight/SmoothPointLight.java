@@ -21,21 +21,25 @@ public class SmoothPointLight extends SmoothPositionalLight {
 
 	protected void updateMesh() {
 		if (rayHandler.world != null && !xray) {
+			// at this point we have just base rays
+			// ignore last ray, that is a duplicate of first
+			currentRayNum--;
+			// lower cap so we will have a spot to add duplicate later
+			rayNum--;
 			updateRays();
+			rayNum++;
 			// shoot check each ray
 			for (int i = 0; i < currentRayNum; i++) {
 				// rayCast is not async, so we can do that
 				rayHandler.world.rayCast(perfectRay, start, current = rays[i]);
 			}
-
 			// we need to sort if stuff was added to set the mesh properly
-			if (currentRayNum >= baseRayNum) {
-				// sort only added rays
+			if (currentRayNum > baseRayNum) {
 				Sort.instance().sort(rays, sorter, 0, currentRayNum);
 			}
+			// add duplicate of the first ray to the end, to close up the mesh
+			rays[currentRayNum++].set(rays[0]);
 		}
-		// add missing last point to finish the loop
-		rays[currentRayNum++].set(rays[0]);
 		onePastEndRayId = currentRayNum;
 	}
 
